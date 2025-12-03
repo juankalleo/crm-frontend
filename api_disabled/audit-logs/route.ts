@@ -4,9 +4,11 @@ import { db, seedDatabase } from "@/lib/storage"
 export async function GET() {
   try {
     seedDatabase()
+
     const auditLogs = Array.from(db.auditLogs.values()).sort(
-      (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
+
     return NextResponse.json({ auditLogs })
   } catch (error) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
@@ -16,13 +18,8 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     seedDatabase()
-    const { action, entity, entityId, userId, changes } = (await request.json()) as {
-      action: string
-      entity: string
-      entityId?: string
-      userId?: string
-      changes?: any
-    }
+
+    const { action, entity, entityId, userId, changes } = await request.json()
 
     const auditLog = {
       id: `audit-${Date.now()}`,
@@ -35,6 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     db.auditLogs.set(auditLog.id, auditLog)
+
     return NextResponse.json(auditLog)
   } catch (error) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

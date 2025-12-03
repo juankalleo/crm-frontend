@@ -6,10 +6,10 @@ export async function POST(request: NextRequest) {
   try {
     seedDatabase()
 
-    const { email, password } = (await request.json()) as { email: string; password: string }
+    const { email, password } = await request.json()
 
     // Find user by email
-    const user = Array.from(db.users.values()).find((u: any) => u.email === email) as any
+    const user = Array.from(db.users.values()).find((u) => u.email === email)
 
     if (!user || user.password !== password) {
       return NextResponse.json({ error: "Invalid email or password" }, { status: 401 })

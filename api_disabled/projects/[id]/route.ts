@@ -6,13 +6,13 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     seedDatabase()
 
     const { id } = params
-    const project = db.projects.get(id) as any
+    const project = db.projects.get(id)
 
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 })
     }
 
-    const participants = project.participants.map((userId: string) => db.users.get(userId)).filter(Boolean)
+    const participants = project.participants.map((userId) => db.users.get(userId)).filter(Boolean)
 
     return NextResponse.json({ project, participants })
   } catch (error) {

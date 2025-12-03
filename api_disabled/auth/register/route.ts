@@ -6,17 +6,15 @@ export async function POST(request: NextRequest) {
   try {
     seedDatabase()
 
-    const { name, email, password } = (await request.json()) as {
-      name: string
-      email: string
-      password: string
-    }
+    const { name, email, password } = await request.json()
 
-    const userExists = Array.from(db.users.values()).find((u: any) => u.email === email)
+    // Check if user exists
+    const userExists = Array.from(db.users.values()).find((u) => u.email === email)
     if (userExists) {
       return NextResponse.json({ error: "User already exists" }, { status: 400 })
     }
 
+    // Create new user
     const userId = generateId()
     const newUser = {
       id: userId,
@@ -31,6 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     db.users.set(userId, newUser)
+
     const token = generateToken(userId, email)
 
     return NextResponse.json({
